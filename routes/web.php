@@ -236,6 +236,11 @@ Route::middleware(['auth'])->prefix('kp')->group(function () {
         Route::delete('/{assignment}', [SubjectAssignmentController::class, 'destroy'])->name('admin.assignments.destroy');
 
     });
+    //csv functionality
+    Route::get('/subjects/download-template/{type}', [SubjectController::class, 'downloadTemplate'])->name('admin.subjects.download.template');
+    Route::post('/subjects/import-create', [SubjectController::class, 'importCreate'])->name('admin.subjects.import.create');
+    Route::post('/subjects/bulk-update', [SubjectController::class, 'bulkUpdate'])->name('admin.subjects.bulk-update');
+    Route::post('/subjects/import-assign', [SubjectController::class, 'importAssign'])->name('admin.subjects.import.assign');
 
     });
 

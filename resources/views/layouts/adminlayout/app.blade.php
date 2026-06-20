@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@yield('title', 'Admin Portal | eCourse Folder')</title>
+    <title>@yield('title', 'Admin Portal | TAALIM FK UMPSA')</title>
+    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
     @vite('resources/css/app.css')
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
