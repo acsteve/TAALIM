@@ -13,7 +13,7 @@ use App\Http\Controllers\Admin\SessionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\SubjectController;
-use App\Http\Controllers\Lecturer\DashboardController;
+use App\Http\Controllers\lecturer\DashboardController;
 use App\Http\Controllers\CourseReportController;
 use App\Http\Controllers\SubjectSectionController;
 use App\Http\Controllers\Admin\SqaController;
