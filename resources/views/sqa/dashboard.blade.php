@@ -1,5 +1,5 @@
 @extends('layouts.sqalayout.app')
-@section('title', 'Finalized Assessments')
+@section('title', 'Academic Records')
 
 @section('content')
 <div class="max-w-6xl mx-auto py-10">

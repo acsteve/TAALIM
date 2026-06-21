@@ -59,21 +59,29 @@
             <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="p-2 bg-red-50 rounded-xl"><i data-lucide="file-text" class="w-5 h-6 text-red-500"></i></div>
-                    <h4 class="text-sm font-bold text-slate-800">Question Paper</h4>
+                    <h4 class="text-sm font-bold text-slate-800">
+                        {{ $assessment->question_filename ?? 'Question Paper' }}
+                    </h4>
                 </div>
-                <a href="{{ asset('storage/' . $assessment->question_file) }}" target="_blank" class="w-full flex items-center justify-center gap-2 py-3 bg-slate-50 text-slate-600 rounded-xl text-[10px] font-bold hover:bg-slate-100 transition">
-                    View Document
+                <a href="{{ route('assessment.view-file', ['id' => $assessment->id, 'type' => 'question']) }}" 
+                target="_blank" 
+                class="w-full flex items-center justify-center gap-2 py-3 bg-slate-50 text-slate-600 rounded-xl text-[10px] font-bold hover:bg-slate-100 transition">
+                    Download/View
                 </a>
             </div>
 
             <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="p-2 bg-emerald-50 rounded-xl"><i data-lucide="check-square" class="w-5 h-6 text-emerald-500"></i></div>
-                    <h4 class="text-sm font-bold text-slate-800">Answer Scheme</h4>
+                    <h4 class="text-sm font-bold text-slate-800">
+                        {{ $assessment->schema_filename ?? 'Answer Scheme' }}
+                    </h4>
                 </div>
-                <a href="{{ asset('storage/' . $assessment->schema_file) }}" target="_blank" class="w-full flex items-center justify-center gap-2 py-3 bg-slate-50 text-slate-600 rounded-xl text-[10px] font-bold hover:bg-slate-100 transition">
-                    View Document
-                </a>
+                    <a href="{{ route('assessment.view-file', ['id' => $assessment->id, 'type' => 'schema']) }}" 
+                    target="_blank" 
+                    class="w-full flex items-center justify-center gap-2 py-3 bg-slate-50 text-slate-600 rounded-xl text-[10px] font-bold hover:bg-slate-100 transition">
+                        Download/View
+                    </a>
             </div>
         </div>
 

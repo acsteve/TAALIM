@@ -106,6 +106,8 @@ Route::prefix('subjcoordinator')->name('subjcoordinator.')->group(function () {
     Route::delete('/reports/{id}', [CourseReportController::class, 'destroy'])
         ->name('reports.destroy');
 
+    //View file
+
     // =========================================================================
     // NEW: Section Management Engine 
     // =========================================================================
@@ -128,6 +130,9 @@ Route::prefix('sme')->middleware(['auth'])->group(function () {
     
     // Workspace
     Route::get('/review/{id}', [SmeController::class, 'review'])->name('sme.review');
+
+    Route::get('/assessment/{id}/view/{type}', [AssessmentController::class, 'viewFileInline'])
+     ->name('assessment.view-file');
     
     // Status Update logic
     Route::patch('/assessment/{id}/status', [SmeController::class, 'updateStatus'])->name('sme.update-status');
@@ -151,7 +156,6 @@ Route::middleware(['auth'])->prefix('kp')->group(function () {
         ->name('kp.finalize');
 
     // 2. 📊 FIXED: Course Report Master Index (Searchable Page)
-    // We attach your exact sidebar route name here so the link points to the search grid
     Route::get('/course-reports', [CourseReportController::class, 'kpIndex'])
         ->name('kp.midterm.audit');
     
@@ -174,6 +178,8 @@ Route::middleware(['auth'])->prefix('kp')->group(function () {
 
     Route::get('/assessment-folder/{id}', [AssessmentController::class, 'kpShowFolder'])
         ->name('kp.assessment.folder');
+
+    Route::get('/assessment/details/{id}', [KpController::class, 'show'])->name('assessment.show');
 });
     /*
     |--------------------------------------------------------------------------

@@ -27,20 +27,22 @@
                         <span class="text-sm">Dashboard</span>
                     </a>
 
-                    <a href="{{ route('kp.verification') }}" 
-                       class="flex items-center justify-between px-4 py-3 rounded-2xl transition {{ Request::is('kp/assessment-verification*') || Request::is('kp/review-assessment*') ? 'bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-600/20' : 'text-slate-400 hover:bg-slate-800 group' }}">
-                        <div class="flex items-center gap-3">
-                            <i data-lucide="check-square" class="w-5 h-5 {{ Request::is('kp/assessment-verification*') ? '' : 'group-hover:text-emerald-400' }}"></i>
-                            <span class="text-sm">Assessments Approval</span>
-                        </div>
-                        
-                        {{-- Dynamic Badge: Only shows if there are pending approvals --}}
-                        @if(isset($pendingKpCount) && $pendingKpCount > 0)
-                            <span class="{{ Request::is('kp/assessment-verification*') ? 'bg-white/20' : 'bg-slate-800 group-hover:bg-emerald-500' }} text-[10px] px-2 py-0.5 rounded-full text-white font-black">
-                                {{ sprintf('%02d', $pendingKpCount) }}
-                            </span>
-                        @endif
-                    </a>
+    <a href="{{ route('kp.verification') }}" 
+    class="flex items-center justify-between px-4 py-3 rounded-2xl transition 
+    {{ $isApprovalActive ? 'bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-600/20' : 'text-slate-400 hover:bg-slate-800 group' }}">
+    
+    <div class="flex items-center gap-3">
+        <i data-lucide="check-square" class="w-5 h-5 {{ $isApprovalActive ? '' : 'group-hover:text-emerald-400' }}"></i>
+        <span class="text-sm">Assessments Approval</span>
+    </div>
+    
+    @if(isset($pendingKpCount) && $pendingKpCount > 0)
+        <span class="{{ $isApprovalActive ? 'bg-white/20' : 'bg-slate-800 group-hover:bg-emerald-500' }} 
+                text-[10px] px-2 py-0.5 rounded-full text-white font-black">
+            {{ sprintf('%02d', $pendingKpCount) }}
+        </span>
+    @endif
+    </a>
                 </nav>
             </div>
 

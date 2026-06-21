@@ -9,33 +9,23 @@ class Assessment extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'user_id',       // The Coordinator
+protected $fillable = [
+        'user_id', 
         'subject_id',
-        'session',
-        'type',
-        'title',
-        'question_file',
-        'schema_file',
+        'title', 
+        'type', 
+        'session', 
         'status',
+        'question_file', 
+        'question_filename',
+        'schema_file', 
+        'schema_filename',
 
-        // SME 1 Review Section
-        'sme1_status',
-        'sme1_comments',
-        'sme1_verified_at',
-        'sme1_id',
+        'sme1_status', 'sme1_comments', 'sme1_verified_at', 'sme1_id',
 
-        // SME 2 Review Section
-        'sme2_status',
-        'sme2_comments',
-        'sme2_verified_at',
-        'sme2_id',
-
-        // KP Review Section
-        'kp_status',
-        'kp_comments',
-        'kp_verified_at',
-        'kp_id',
+        'sme2_status', 'sme2_comments', 'sme2_verified_at', 'sme2_id',
+        
+        'kp_status', 'kp_comments', 'kp_verified_at', 'kp_id',
     ];
 
     public function answerSamples()

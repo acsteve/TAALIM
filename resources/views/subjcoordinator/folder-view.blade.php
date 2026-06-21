@@ -52,17 +52,25 @@
 
     {{-- Files Section --}}
     <div class="grid md:grid-cols-2 gap-6">
-        @foreach(['Question Paper' => 'question_file', 'Marking Scheme' => 'schema_file'] as $label => $field)
+        @foreach([
+            'Question Paper' => ['file' => 'question_file', 'name' => 'question_filename'], 
+            'Marking Scheme' => ['file' => 'schema_file', 'name' => 'schema_filename']
+        ] as $label => $fields)
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
             <div class="flex items-center gap-3 mb-6">
                 <div class="p-2 bg-indigo-50 rounded-lg">
-                    <i data-lucide="{{ $loop->first ? 'file-text' : 'key' }}" class="w-5 h-5 text-indigo-600"></i>
+                    <i data-lucide="{{ $label == 'Question Paper' ? 'file-text' : 'key' }}" class="w-5 h-5 text-indigo-600"></i>
                 </div>
                 <h3 class="text-xs font-black text-slate-900 uppercase tracking-[0.2em]">{{ $label }}</h3>
             </div>
             <div class="flex items-center justify-between bg-slate-50 p-4 rounded-xl border border-slate-100">
-                <span class="text-xs font-bold text-slate-600 truncate max-w-[200px]">{{ basename($assessment->$field) }}</span>
-                <a href="{{ Storage::url($assessment->$field) }}" target="_blank" class="text-[10px] font-black text-indigo-600 uppercase hover:underline">View</a>
+                {{-- Use the 'name' column instead of basename() --}}
+                <span class="text-xs font-bold text-slate-600 truncate max-w-[200px]">
+                    {{ $assessment->{$fields['name']} ?? 'No file' }}
+                </span>
+                <a href="{{ route('assessment.view-file', ['id' => $assessment->id, 'type' => $label == 'Question Paper' ? 'question' : 'schema']) }}" 
+                target="_blank" 
+                class="text-[10px] font-black text-indigo-600 uppercase hover:underline">View</a>
             </div>
         </div>
         @endforeach
@@ -75,16 +83,19 @@
         </div>
         
         <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-            @foreach(['best' => 'Good', 'medium' => 'Moderate', 'weak' => 'Needs Improvement'] as $category => $label)
+            @foreach(['best' => 'Best', 'medium' => 'Medium', 'weak' => 'Weak'] as $category => $label)
             <div class="space-y-4">
                 <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ $label }}</h4>
                 
                 @forelse(($assessment->answerSamples ?? collect())->where('category', $category) as $sample)
-                <a href="{{ Storage::url($sample->file_path) }}" target="_blank" 
-                   class="flex items-center justify-between p-3 bg-slate-50 hover:bg-indigo-50 border border-slate-100 rounded-xl transition">
-                    <span class="text-[10px] font-bold text-slate-700">{{ $sample->filename ?? 'File' }}</span>
-                    <i data-lucide="external-link" class="w-3 h-3 text-slate-400"></i>
-                </a>
+                    <a href="{{ route('assessment.view-file', ['id' => $sample->id, 'type' => 'sample']) }}" 
+                    target="_blank" 
+                    class="flex items-center justify-between p-3 bg-slate-50 hover:bg-indigo-50 border border-slate-100 rounded-xl transition">
+                        <span class="text-[10px] font-bold text-slate-700 truncate">
+                            {{ $sample->filename ?? 'Student_Script.pdf' }}
+                        </span>
+                        <i data-lucide="external-link" class="w-3 h-3 text-slate-400"></i>
+                    </a>
                 @empty
                 <p class="text-[10px] text-slate-400 italic">No files</p>
                 @endforelse

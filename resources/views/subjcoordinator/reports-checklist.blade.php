@@ -11,9 +11,9 @@
             <span class="text-sm font-bold text-indigo-600 uppercase tracking-wider">{{ $subject->subject_code }}</span>
             <h1 class="text-3xl font-black text-slate-900 mt-1">Subject Reports</h1>
             <p class="text-sm text-slate-500 mt-1">
-                Central portfolio depository for academic validation tracks: 
+                Subject Reports For: 
                 <span class="font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded ml-1">
-                    Semester {{ $session }}
+                    Semester {{ $activeSession->name }}
                 </span>
             </p>
         </div>

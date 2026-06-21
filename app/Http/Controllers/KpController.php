@@ -127,4 +127,19 @@ class KpController extends Controller
 
         return view('kp.midterm-meeting-audit', compact('subjects', 'midtermRecords', 'selectedSubjectId'));
     }
+
+    public function show($id)
+    {
+        // We use 'with' to eager load relationships to prevent N+1 query issues
+        $assessment = Assessment::with([
+            'subject.coordinator', 
+            'kp', 
+            'sme1', 
+            'sme2', 
+            'answerSamples'
+        ])->findOrFail($id);
+
+        // Return the specific view you shared earlier
+        return view('kp.assessment-details', compact('assessment'));
+    }
 }

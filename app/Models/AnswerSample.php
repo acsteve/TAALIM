@@ -9,7 +9,7 @@ class AnswerSample extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['assessment_id', 'category', 'file_path'];
+    protected $fillable = ['assessment_id', 'category', 'file_path', 'filename'];
 
     /**
      * Get the assessment that owns the answer sample.

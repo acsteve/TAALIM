@@ -88,68 +88,106 @@ class SubjectController extends Controller
         ]);
     }
 
-    public function importCreate(Request $request)
-    {
-        // 1. Validate the request
-        $request->validate([
-            'course_id' => 'required|exists:courses,id', 
-            'file' => 'required|file|mimes:csv,txt'
-        ]);
+public function importCreate(Request $request)
+{
+    $request->validate([
+        'course_id' => 'required|exists:courses,id', 
+        'file'      => 'required|file|mimes:csv,txt'
+    ]);
 
-        $handle = fopen($request->file('file')->getRealPath(), 'r');
-        fgetcsv($handle); 
-        while (($data = fgetcsv($handle)) !== FALSE) {
-            // Ensure we have at least 2 columns (subject_code and subject_name)
-            if (isset($data[0]) && isset($data[1])) {
-                Subject::updateOrCreate(
-                    ['subject_code' => trim($data[0])], // Unique identifier
-                    [
-                        'subject_name' => trim($data[1]), 
-                        'course_id' => $request->course_id // Use the validated course_id from form
-                    ]
-                );
+    $handle = fopen($request->file('file')->getRealPath(), 'r');
+    fgetcsv($handle); // Skip header
+
+    $successCount = 0;
+    $errors = [];
+    $rowNumber = 1;
+
+    while (($data = fgetcsv($handle)) !== FALSE) {
+        $rowNumber++;
+        
+        if (count($data) < 2) { 
+            $errors[] = "Row {$rowNumber}: Missing required columns."; 
+            continue; 
+        }
+
+        $code = trim($data[0]);
+        $name = trim($data[1]);
+
+        // CHECK: Does this code already exist in the database?
+        if (Subject::where('subject_code', $code)->exists()) {
+            $errors[] = "Row {$rowNumber}: Subject code '{$code}' already exists.";
+            continue; // Stop here for this row and move to the next
+        }
+
+        // Create new only if it doesn't exist
+        Subject::create([
+            'subject_code' => $code,
+            'subject_name' => $name, 
+            'course_id'    => $request->course_id
+        ]);
+        
+        $successCount++;
+    }
+
+    fclose($handle);
+
+    if (!empty($errors)) {
+        return back()->with('import_errors', $errors);
+    }
+
+    return back()->with('success', "{$successCount} subjects imported successfully.");
+}
+
+
+public function importAssign(Request $request)
+{
+    $request->validate([
+        'file' => 'required|file|mimes:csv,txt',
+        'course_id' => 'required|exists:courses,id'
+    ]);
+
+    $handle = fopen($request->file('file')->getRealPath(), 'r');
+    fgetcsv($handle); 
+
+    $successCount = 0;
+    $errors = [];
+    $rowNumber = 1;
+
+    while (($data = fgetcsv($handle)) !== FALSE) {
+        $rowNumber++;
+        if (count($data) < 4) { $errors[] = "Row {$rowNumber}: Missing columns."; continue; }
+
+        $subject = Subject::where('subject_code', trim($data[0]))->where('course_id', $request->course_id)->first();
+        if (!$subject) { $errors[] = "Row {$rowNumber}: Subject not found."; continue; }
+
+        $coordinatorId = !empty($data[1]) ? User::where('staff_id', trim($data[1]))->value('id') : $subject->coordinator_id;
+
+        
+        if ($coordinatorId && $coordinatorId != $subject->coordinator_id) {
+            $isAlreadyCoordinating = Subject::where('coordinator_id', $coordinatorId)
+                ->where('id', '!=', $subject->id)
+                ->exists();
+
+            if ($isAlreadyCoordinating) {
+                $errors[] = "Row {$rowNumber}: Staff ID " . trim($data[1]) . " is already a coordinator for another subject.";
+                continue;
             }
         }
-        
+       
 
-        fclose($handle);
-        return redirect()->back()->with('success', 'Subjects imported successfully.');
-    }
-
-    public function importAssign(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|file|mimes:csv,txt',
-            'course_id' => 'required|exists:courses,id'
+        $subject->update([
+            'coordinator_id' => $coordinatorId,
+            'sme1_id'        => !empty($data[2]) ? User::where('staff_id', trim($data[2]))->value('id') : $subject->sme1_id,
+            'sme2_id'        => !empty($data[3]) ? User::where('staff_id', trim($data[3]))->value('id') : $subject->sme2_id,
         ]);
-
-        $handle = fopen($request->file('file')->getRealPath(), 'r');
-        fgetcsv($handle); 
-
-        $successCount = 0;
-        $errors = [];
-        $rowNumber = 1;
-
-        while (($data = fgetcsv($handle)) !== FALSE) {
-            $rowNumber++;
-            if (count($data) < 4) { $errors[] = "Row {$rowNumber}: Missing columns."; continue; }
-
-            $subject = Subject::where('subject_code', trim($data[0]))->where('course_id', $request->course_id)->first();
-            if (!$subject) { $errors[] = "Row {$rowNumber}: Subject not found."; continue; }
-
-            $subject->update([
-                'coordinator_id' => !empty($data[1]) ? User::where('staff_id', trim($data[1]))->value('id') : $subject->coordinator_id,
-                'sme1_id'        => !empty($data[2]) ? User::where('staff_id', trim($data[2]))->value('id') : $subject->sme1_id,
-                'sme2_id'        => !empty($data[3]) ? User::where('staff_id', trim($data[3]))->value('id') : $subject->sme2_id,
-            ]);
-            $successCount++;
-        }
-        fclose($handle);
-
-        return !empty($errors) 
-            ? back()->with('error', "Processed {$successCount} rows. Errors: " . implode(' | ', array_slice($errors, 0, 3)))
-            : back()->with('success', "Bulk assignment processed: {$successCount} updated.");
+        $successCount++;
     }
+    fclose($handle);
+
+    return !empty($errors) 
+        ? back()->with('import_errors', $errors)
+        : back()->with('success', "Bulk assignment processed: {$successCount} updated.");
+}
 
     private function validateSubject(Request $request, $subjectId = null)
     {

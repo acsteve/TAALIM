@@ -35,8 +35,24 @@
     @if (session('success'))
         <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-2xl mb-6 text-xs font-bold">{{ session('success') }}</div>
     @endif
-    @if (session('error'))
-        <div class="bg-rose-50 border border-rose-200 text-rose-800 p-4 rounded-2xl mb-6 text-xs font-bold">{{ session('error') }}</div>
+
+    {{-- Error Modal for Bulk CSV Imports --}}
+    @if (session('import_errors'))
+        <div x-data="{ showErrors: true }" x-show="showErrors" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" @click="showErrors = false"></div>
+            <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg p-8 relative z-10 max-h-[80vh] flex flex-col">
+                <div class="flex justify-between items-center mb-6">
+                    <h4 class="text-xl font-black text-rose-600">Import Errors</h4>
+                    <button @click="showErrors = false" class="text-slate-400 hover:text-slate-600"><i data-lucide="x"></i></button>
+                </div>
+                <div class="overflow-y-auto flex-1 pr-2 space-y-2">
+                    @foreach (session('import_errors') as $error)
+                        <div class="text-xs font-medium text-rose-800 bg-rose-50 p-3 rounded-xl border border-rose-100">{{ $error }}</div>
+                    @endforeach
+                </div>
+                <button @click="showErrors = false" class="mt-6 w-full bg-slate-900 text-white py-3 rounded-2xl font-black text-xs uppercase">Dismiss</button>
+            </div>
+        </div>
     @endif
     
     <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -60,7 +76,7 @@
                 <i data-lucide="upload" class="w-4 h-4"></i> Import Subjects
             </button>
             <button type="button" @click="showAssignCsv = true" class="px-6 py-3 bg-amber-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-amber-600 transition flex items-center gap-2">
-                <i data-lucide="users" class="w-4 h-4"></i> Assign Bulk
+                <i data-lucide="users" class="w-4 h-4"></i> Import Staff Assignments
             </button>
             <button type="button" @click="openAddModal()" class="px-6 py-3 bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition flex items-center gap-2">
                 <i data-lucide="plus" class="w-4 h-4"></i> Add New Subject
@@ -127,6 +143,18 @@
                 <input type="hidden" name="_method" :value="editMode ? 'PATCH' : 'POST'">
                 <div class="p-10">
                     <h4 class="text-2xl font-black text-slate-900 mb-8" x-text="editMode ? 'Subject Assignment' : 'New Subject'"></h4>
+                    
+                    {{-- Validation Error Display --}}
+                    @if ($errors->any())
+                        <div class="mb-6 p-4 bg-rose-50 rounded-2xl border border-rose-100">
+                            <ul class="text-xs font-bold text-rose-800 list-disc list-inside">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-4">
                             <input type="text" name="subject_code" required x-model="formData.code" placeholder="Code" class="w-full bg-slate-50 border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold">

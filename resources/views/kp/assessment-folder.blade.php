@@ -28,7 +28,7 @@
                     </p>
                 </div>
                 {{-- Add your Download Zip route here if available --}}
-                <a href="#" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 hover:bg-emerald-700 shadow-sm transition">
+                <a href="{{ route('subjcoordinator.assessment.download-zip', $assessment->id) }}" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 hover:bg-emerald-700 shadow-sm transition">
                     <i data-lucide="download" class="w-4 h-4"></i> Download Full Folder
                 </a>
             </div>
@@ -69,7 +69,9 @@
             <div class="flex items-center justify-between bg-slate-50 p-4 rounded-xl border border-slate-100">
                 <div class="flex items-center gap-3">
                     <i data-lucide="file" class="w-5 h-5 text-slate-400"></i>
-                    <span class="text-sm font-medium text-slate-600 truncate max-w-[200px]">{{ basename($assessment->$field ?? 'No file') }}</span>
+                    <span class="text-sm font-medium text-slate-600 truncate max-w-[200px]">
+                        {{ $loop->first ? $assessment->question_filename : $assessment->schema_filename }}
+                    </span>
                 </div>
                 <a href="{{ Storage::url($assessment->$field ?? '') }}" target="_blank" class="text-emerald-600 hover:text-emerald-800 text-xs font-black uppercase tracking-tighter">View</a>
             </div>
@@ -96,7 +98,7 @@
                 <a href="{{ Storage::url($sample->file_path) }}" target="_blank" class="group flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 border border-transparent rounded-xl transition">
                     <div class="flex items-center gap-2">
                         <i data-lucide="file-check-2" class="w-4 h-4 text-slate-400"></i>
-                        <span class="text-xs font-medium text-slate-700">{{ $sample->filename ?? 'File' }}</span>
+                        <span class="text-xs font-medium text-slate-700">{{ $sample->filename }}</span>
                     </div>
                     <i data-lucide="eye" class="w-3 h-3 text-slate-300"></i>
                 </a>

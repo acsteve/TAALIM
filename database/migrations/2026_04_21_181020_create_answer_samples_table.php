@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('assessment_id')->constrained()->onDelete('cascade');
             $table->string('category'); // best, medium, weak
             $table->string('file_path');
+            $table->string('filename')->nullable();
             $table->timestamps();
         });
     }

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use ZipArchive;
 use Illuminate\Support\Facades\File;
 
+
 class AssessmentController extends Controller
 {
     private function getSessionPath()
@@ -117,14 +118,21 @@ class AssessmentController extends Controller
         
         $zip = new ZipArchive();
         if ($zip->open($fullZipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
+            $publicPath = storage_path('app/public/');
             if (Storage::disk('public')->exists($assessment->question_file)) $zip->addFile(storage_path("app/public/{$assessment->question_file}"), 'Question_Paper.pdf');
             if (Storage::disk('public')->exists($assessment->schema_file)) $zip->addFile(storage_path("app/public/{$assessment->schema_file}"), 'Marking_Scheme.pdf');
             foreach ($assessment->answerSamples as $sample) {
-                if (Storage::disk('public')->exists($sample->file_path)) $zip->addFile(storage_path("app/public/{$sample->file_path}"), "Samples/{$sample->filename}");
+                if (Storage::disk('public')->exists($sample->file_path)) {
+                    // We add $sample->id to the filename to ensure it is unique
+                    $internalPath = "Samples/" . ucfirst($sample->category) . "/{$sample->id}_{$sample->filename}";
+                    
+                    $zip->addFile(storage_path("app/public/{$sample->file_path}"), $internalPath);
+                }
             }
             $zip->close();
         }
-        return response()->download($fullZipPath)->deleteFileAfterSend(true);
+        return response()->download($fullZipPath, 'Assessment_' . $assessment->title . '.zip')
+                 ->deleteFileAfterSend(true);
     }
 
 public function kpSubjectList(Request $request)
@@ -177,6 +185,32 @@ public function kpSubjectAssessments($subjectId, Request $request)
 
     return view('kp.subject-assessment', compact('subject', 'assessments', 'sessionName'));
 }
+
+    public function viewFileInline($id, $type)
+    {
+        // 1. Handle Sample type vs Assessment type
+        if ($type === 'sample') {
+            $item = \App\Models\AnswerSample::findOrFail($id);
+            $path = $item->file_path;
+            $filename = $item->filename ?? 'student_sample.pdf';
+        } else {
+            $item = \App\Models\Assessment::findOrFail($id);
+            $path = ($type === 'question') ? $item->question_file : $item->schema_file;
+            $filename = ($type === 'question') ? $item->question_filename : $item->schema_filename;
+        }
+
+        // 2. Validate existence
+        if (!$path || !Storage::disk('public')->exists($path)) {
+            
+            abort(404, "The requested file could not be found.");
+        }
+
+        // 3. Return the file
+        return response()->file(storage_path('app/public/' . $path), [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $filename . '"'
+        ]);
+    }
 
 public function viewFile($id)
 {

@@ -23,7 +23,6 @@
         <select x-model="roleFilter" class="bg-white border border-slate-200 rounded-2xl text-sm font-bold p-4 outline-none">
             <option value="All">All Roles</option>
             <option value="admin">Admin</option>
-            <option value="kp">Ketua Program</option>
             <option value="lecturer">Lecturer</option>
         </select>
     </div>
@@ -157,7 +156,6 @@
                         <select name="role" x-model="selectedRole" required class="w-full mt-1.5 bg-slate-50 border-slate-200 rounded-2xl text-sm font-bold p-3 appearance-none">
                             <option value="">Select a role...</option>
                             <option value="lecturer">Lecturer</option>
-                            <option value="kp">Ketua Program (KP)</option>
                             <option value="admin">Admin</option>
                         </select>
                     </div>

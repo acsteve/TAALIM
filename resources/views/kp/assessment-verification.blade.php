@@ -101,28 +101,35 @@
     </div>
 
     {{-- Tab 3: Archived --}}
-    <div x-show="tab === 'archived'" x-transition style="display: none;" class="space-y-8">
-        @forelse($groupData($archivedAssessments) as $subjectId => $items)
-            <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
-                <div class="px-8 py-5 border-b border-slate-100 bg-slate-50">
-                    <h3 class="text-sm font-black text-slate-800 uppercase">{{ optional($items->first()->subject)->subject_name }}</h3>
-                </div>
-                <table class="w-full text-left">
-                    <tbody class="divide-y divide-slate-100">
-                        @foreach($items as $item)
-                        <tr class="bg-emerald-50/10">
-                            <td class="px-8 py-4 font-bold text-slate-700">{{ $item->title }}</td>
-                            <td class="px-8 py-4 text-[10px] text-slate-400 font-black uppercase">
-                                {{ $item->kp_verified_at ? \Carbon\Carbon::parse($item->kp_verified_at)->format('d M Y') : 'N/A' }}
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+<div x-show="tab === 'archived'" x-transition style="display: none;" class="space-y-8">
+    @forelse($groupData($archivedAssessments) as $subjectId => $items)
+        <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-8 py-5 border-b border-slate-100 bg-slate-50">
+                <h3 class="text-sm font-black text-slate-800 uppercase">{{ optional($items->first()->subject)->subject_name }}</h3>
             </div>
-        @empty
-            <div class="text-center py-20 border-2 border-dashed border-slate-200 rounded-[2rem] text-slate-400 font-bold uppercase text-[12px]">No archived assessments.</div>
-        @endforelse
-    </div>
+            <table class="w-full text-left">
+                <tbody class="divide-y divide-slate-100">
+                    @foreach($items as $item)
+                    <tr class="bg-emerald-50/10 hover:bg-emerald-50 transition">
+                        <td class="px-8 py-4 font-bold text-slate-700">{{ $item->title }}</td>
+                        <td class="px-8 py-4 text-[10px] text-slate-400 font-black uppercase">
+                            {{ $item->kp_verified_at ? \Carbon\Carbon::parse($item->kp_verified_at)->format('d M Y') : 'N/A' }}
+                        </td>
+                        {{-- NEW VIEW BUTTON COLUMN --}}
+                        <td class="px-8 py-4 text-right">
+                            <a href="{{ route('assessment.show', $item->id) }}" 
+                               class="text-[10px] font-black uppercase bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                                View Details
+                            </a>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @empty
+        <div class="text-center py-20 border-2 border-dashed border-slate-200 rounded-[2rem] text-slate-400 font-bold uppercase text-[12px]">No archived assessments.</div>
+    @endforelse
+</div>
 </div>
 @endsection

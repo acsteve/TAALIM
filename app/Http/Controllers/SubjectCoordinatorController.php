@@ -55,43 +55,49 @@ class SubjectCoordinatorController extends Controller
      * Store a newly created assessment
      */
     public function store(Request $request)
-    {
-        $request->validate([
-            'subject_id'      => 'required|exists:subjects,id',
-            'assessment_type' => 'required|string',
-            'title'           => 'required|string|max:255',
-            'question_file'   => 'required|mimes:pdf|max:10240',
-            'schema_file'     => 'required|mimes:pdf|max:10240',
-        ]);
+        {
+            $request->validate([
+                'subject_id'      => 'required|exists:subjects,id',
+                'assessment_type' => 'required|string',
+                'title'           => 'required|string|max:255',
+                'question_file'   => 'required|mimes:pdf|max:10240',
+                'schema_file'     => 'required|mimes:pdf|max:10240',
+            ]);
 
-        $activeSession = AcademicSession::where('is_active', true)->first();
+            $activeSession = AcademicSession::where('is_active', true)->first();
 
-        $assessment = new Assessment();
-        $assessment->user_id    = Auth::id();
-        $assessment->subject_id = $request->subject_id;
-        $assessment->title      = $request->title;
-        $assessment->type       = $request->assessment_type;
-        $assessment->session    = $activeSession ? $activeSession->name : 'N/A';
-        
-        // Handling file storage
-        if ($request->hasFile('question_file')) {
-            $assessment->question_file = $request->file('question_file')->store('assessments', 'public');
+            $assessment = new Assessment();
+            $assessment->user_id    = Auth::id();
+            $assessment->subject_id = $request->subject_id;
+            $assessment->title      = $request->title;
+            $assessment->type       = $request->assessment_type;
+            $assessment->session    = $activeSession ? $activeSession->name : 'N/A';
+            
+            // Handling file storage
+            if ($request->hasFile('question_file')) {
+                $qFile = $request->file('question_file');
+                $assessment->question_file = $qFile->store('assessments', 'public');
+                // ADD THIS LINE
+                $assessment->question_filename = $qFile->getClientOriginalName();
+            }
+            
+            if ($request->hasFile('schema_file')) {
+                $sFile = $request->file('schema_file');
+                $assessment->schema_file = $sFile->store('inventory', 'public');
+                // ADD THIS LINE
+                $assessment->schema_filename = $sFile->getClientOriginalName();
+            }
+
+            // Initialize statuses
+            $assessment->sme1_status = 'pending';
+            $assessment->sme2_status = 'pending';
+            $assessment->kp_status   = 'pending';
+            $assessment->status      = 'pending';
+            
+            $assessment->save();
+
+            return redirect()->route('subjcoordinator.index')->with('success', 'Assessment uploaded successfully.');
         }
-        
-        if ($request->hasFile('schema_file')) {
-            $assessment->schema_file = $request->file('schema_file')->store('inventory', 'public');
-        }
-
-        // Initialize statuses for the workflow
-        $assessment->sme1_status = 'pending';
-        $assessment->sme2_status = 'pending';
-        $assessment->kp_status   = 'pending';
-        $assessment->status      = 'pending';
-        
-        $assessment->save();
-
-        return redirect()->route('subjcoordinator.index')->with('success', 'Assessment uploaded successfully.');
-    }
 
     /**
      * Handle the Re-upload/Correction logic from the Alpine.js Modal
@@ -210,6 +216,31 @@ class SubjectCoordinatorController extends Controller
         return view('subjcoordinator.answersample-upload', compact('completedAssessments', 'recentUploads', 'subject', 'session'));
     }
 
+public function viewFileInline($id, $type)
+{
+    // Handle the Sample type separately
+    if ($type === 'sample') {
+        $item = \App\Models\AnswerSample::findOrFail($id);
+        $path = $item->file_path;
+        $filename = $item->filename; // Ensure you have this column!
+    } else {
+        // Handle Assessment types
+        $item = \App\Models\Assessment::findOrFail($id);
+        $path = ($type === 'question') ? $item->question_file : $item->schema_file;
+        $filename = ($type === 'question') ? $item->question_filename : $item->schema_filename;
+    }
+
+    if (!Storage::disk('public')->exists($path)) {
+        
+        abort(404);
+    }
+
+    return response()->file(storage_path('app/public/' . $path), [
+        'Content-Type' => 'application/pdf',
+        'Content-Disposition' => 'inline; filename="' . $filename . '"'
+    ]);
+}
+
     /**
      * Atomically process and store all 9 nested student answer samples
      */
@@ -248,7 +279,9 @@ class SubjectCoordinatorController extends Controller
                     AnswerSample::create([
                         'assessment_id' => $assessment->id,
                         'category'      => $normalizedCategory,
-                        'file_path'     => $storagePath
+                        'file_path'     => $storagePath,
+                        'filename'      => $file->getClientOriginalName()
+                        
                     ]);
                 }
             }

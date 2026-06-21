@@ -17,8 +17,11 @@ return new class extends Migration
             $table->string('session'); // e.g., 2025/2026-1
             $table->string('type');    // e.g., Quiz, Assignment, Test, Final
             $table->string('title');
+            $table->string('question_filename');
             $table->string('question_file'); 
-            $table->string('schema_file');   
+            $table->string('schema_filename');
+            $table->string('schema_file'); 
+              
             
             // Overall Status (Calculated: Approved only if SME1, SME2, and KP approve)
             $table->string('status')->default('pending'); 

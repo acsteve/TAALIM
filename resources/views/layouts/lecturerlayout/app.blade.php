@@ -106,9 +106,15 @@
                                 <i data-lucide="chevron-down" class="w-4 h-4 transition-transform" :class="openKp ? 'rotate-180' : ''"></i>
                             </button>
                             <div x-show="openKp" x-cloak x-transition class="mt-2 ml-6 space-y-1 border-l-2 border-slate-800 pl-4">
-                                <a href="{{ route('kp.verification') }}" class="block py-2 text-xs {{ Request::routeIs('kp.verification') ? 'text-emerald-400 font-bold' : 'text-slate-500 hover:text-white' }}">Assessment Approvals</a>
+                                <a href="{{ route('kp.verification') }}" 
+                                    class="block py-2 text-xs {{ (Request::routeIs('kp.verification') || Request::routeIs('assessment.show')) ? 'text-emerald-400 font-bold' : 'text-slate-500 hover:text-white' }}">
+                                    Assessment Approvals
+                                </a>  
                                 <a href="{{ route('kp.midterm.audit') }}" class="block py-2 text-xs {{ (Request::routeIs('kp.midterm.audit') || Request::is('kp/reports*')) ? 'text-emerald-400 font-bold' : 'text-slate-500 hover:text-white' }}">Subject Report</a>
-                                <a href="{{ route('kp.assessment-archive') }}" class="block py-2 text-xs {{ request()->routeIs(['kp.assessment-archive', 'kp.subject.assessments']) ? 'text-emerald-400 font-bold' : 'text-slate-500 hover:text-white' }}">Archived Assessment</a>
+                                <a href="{{ route('kp.assessment-archive') }}" 
+                                class="block py-2 text-xs {{ request()->routeIs(['kp.assessment-archive', 'kp.subject.assessments', 'kp.assessment.folder']) ? 'text-emerald-400 font-bold' : 'text-slate-500 hover:text-white' }}">
+                                Archived Assessment
+                                </a>
                             </div>
                         </div>
                     </div>
