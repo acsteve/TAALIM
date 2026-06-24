@@ -21,34 +21,4 @@ Frontend Components: JavaScript, CSS (with Blade templating)
 
 Environment: Node.js, npm
 
-Installation & Setup
-To run this project locally, ensure you have Composer and Node.js installed.
 
-Clone the repository:
-
-Bash
-
-
-git clone https://github.com/your-username/taalim.git
-cd taalim
-
-2.  **Install PHP dependencies:**
-    ```bash
-composer install
-Install frontend dependencies:
-
-Bash
-
-
-npm install && npm run dev
-
-4.  **Configure environment:**
-    *   Copy the example environment file: `cp .env.example .env`
-    *   Update your database credentials in the `.env` file.
-
-5.  **Run migrations:**
-    ```bash
-php artisan migrate
-Serve the application:
-
-php artisan serve
