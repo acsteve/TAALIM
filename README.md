@@ -1,5 +1,5 @@
 TAALIM: Assessment Management System
-TAALIM is a centralized web-based platform designed to streamline assessment management in higher education. It facilitates the submission, review, and validation of assessment materials and student answer samples, ensuring a smooth workflow between Subject Coordinators, Subject Matter Experts (SME), and academic administrators.
+TAALIM is a centralized web-based platform designed to streamline subjects documents management in higher education. It facilitates the submission, review, and validation of assessment materials and reports, ensuring a smooth workflow between Subject Coordinators, Subject Matter Experts (SME), and academic administrators.
 
 Key Features
 Role-Based Access Control: Secure modules tailored for Subject Coordinators, SME assessment verification, and administrators.
